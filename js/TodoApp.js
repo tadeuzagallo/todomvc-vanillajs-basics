@@ -1,4 +1,4 @@
-(function (window, TodoInput, TodoList, TodoStats) {
+(function (window, TodoInput, TodoList, TodoStats, TodoStore) {
   'use strict';
 
   new TodoInput('#new-todo');
@@ -32,4 +32,10 @@
   }
   window.addEventListener('hashchange', hashchange);
   hashchange();
-})(window, window.TodoInput, window.TodoList, window.TodoStats);
+
+  document.querySelector('#clear-completed').addEventListener('click', function () {
+    TodoStore.todos = TodoStore.activeTodos();
+    TodoStore.emmit('changeAll');
+    todoList.refresh();
+  });
+})(window, window.TodoInput, window.TodoList, window.TodoStats, window.TodoStore);

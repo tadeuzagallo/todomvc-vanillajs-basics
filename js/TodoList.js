@@ -3,9 +3,6 @@ window.TodoList = (function (document, TodoStore, TodoItem) {
 
   function TodoList(selector) {
     this.el = document.querySelector(selector);
-    this._items = TodoStore.todos.map(function (todo) {
-      return new TodoItem(todo);
-    });
     this._bind();
     this.refresh();
   }
@@ -23,7 +20,9 @@ window.TodoList = (function (document, TodoStore, TodoItem) {
   };
 
   TodoList.prototype.refresh = function () {
-    var items = this._items;
+    var items = this._items = TodoStore.todos.map(function (todo) {
+      return new TodoItem(todo);
+    });
 
     if (this.filter) {
       var key = this.filter[0];
