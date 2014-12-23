@@ -62,7 +62,7 @@ window.TodoItem = (function (document, TodoStore) {
   };
 
   TodoItem.prototype._doneEditing = function () {
-    this._todo.title = this.input.value.trim(); 
+    this._todo.title = this.input.value.trim();
     this.input.value = '';
     this.update();
 
