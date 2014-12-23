@@ -3,8 +3,11 @@ window.TodoList = (function (document, TodoStore, TodoItem) {
 
   function TodoList(selector) {
     this.el = document.querySelector(selector);
-    this._items = [];
+    this._items = TodoStore.todos.map(function (todo) {
+      return new TodoItem(todo);
+    });
     this._bind();
+    this.refresh();
   }
 
   TodoList.prototype._bind = function () {

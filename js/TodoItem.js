@@ -50,7 +50,7 @@ window.TodoItem = (function (document, TodoStore) {
 
   TodoItem.prototype._delete = function () {
     this.el.parentNode.removeChild(this.el);
-    TodoStore.remove(this._todo);
+    TodoStore.destroy(this._todo);
   };
 
   TodoItem.prototype._edit = function () {
@@ -79,6 +79,7 @@ window.TodoItem = (function (document, TodoStore) {
   TodoItem.prototype.update = function () {
     this.el.className = this._todo.completed ? 'completed' : '';
     this.label.innerText = this._todo.title;
+    this.checkbox.checked = this._todo.completed;
   };
 
   return TodoItem;

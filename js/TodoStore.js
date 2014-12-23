@@ -5,7 +5,13 @@ window.TodoStore = (function (Todo) {
 
   
   TodoStore.events = {};
-  TodoStore.todos = [];
+
+  var savedItems = localStorage.getItem('todos');
+  if (savedItems) {
+    TodoStore.todos = JSON.parse(savedItems);
+  } else {
+    TodoStore.todos = [];
+  }
 
   TodoStore.create = function (value) {
     var newTodo = new Todo(value);
@@ -21,6 +27,10 @@ window.TodoStore = (function (Todo) {
     );
 
     this.emmit('changeAll');
+  };
+
+  TodoStore.save = function () {
+    localStorage.setItem('todos', JSON.stringify(this.todos));
   };
 
   TodoStore.activeTodos = function () {
@@ -62,6 +72,8 @@ window.TodoStore = (function (Todo) {
       });
     }
   };
+
+  TodoStore.on('changeAll', TodoStore.save.bind(TodoStore));
 
   return TodoStore;
 })(window.Todo, window.TodoList);
