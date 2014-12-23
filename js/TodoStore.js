@@ -3,26 +3,43 @@ window.TodoStore = (function (Todo) {
 
   var TodoStore = {};
 
-  var _todos = [];
-  var _events = {};
   
+  TodoStore.events = {};
+  TodoStore.todos = [];
+
   TodoStore.create = function (value) {
     var newTodo = new Todo(value);
-    _todos.push(newTodo);
+    this.todos.push(newTodo);
     this.emmit('new', newTodo);
+    this.emmit('changeAll');
+  };
+
+  TodoStore.destroy = function (todo) {
+    this.todos.splice(
+      this.todos.indexOf(todo),
+      1
+    );
+
+    this.emmit('changeAll');
+  };
+
+  TodoStore.activeTodos = function () {
+    return this.todos.filter(function (todo) {
+      return !todo.completed;
+    });
   };
 
   TodoStore.on = function (event, callback) {
-    if (typeof _events[event] === 'undefined') {
-      _events[event] = [];
+    if (typeof this.events[event] === 'undefined') {
+      this.events[event] = [];
     }
 
-    _events[event].push(callback);
+    this.events[event].push(callback);
   };
 
   TodoStore.off = function (event, callback) {
     if (callback) {
-      var callbacks = _events[event];
+      var callbacks = this.events[event];
       if (callbacks) {
         for (var i = 0, l = callbacks.length; i < l; i++) {
           if (callbacks[i] === callback) {
@@ -32,12 +49,12 @@ window.TodoStore = (function (Todo) {
         }
       }
     } else {
-      _events[event] = undefined;
+      this.events[event] = undefined;
     }
   };
 
   TodoStore.emmit = function (event, data) {
-    var callbacks = _events[event];
+    var callbacks = this.events[event];
 
     if (callbacks) {
       callbacks.forEach(function (callback) {

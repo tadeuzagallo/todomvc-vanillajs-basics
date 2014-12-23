@@ -1,4 +1,4 @@
-window.TodoItem = (function (document) {
+window.TodoItem = (function (document, TodoStore) {
   'use strict';
 
   function TodoItem(todo) {
@@ -38,10 +38,12 @@ window.TodoItem = (function (document) {
   TodoItem.prototype._toggle = function () {
     this._todo.completed = this.checkbox.checked;
     this.update();
+    TodoStore.emmit('changeAll');
   };
 
   TodoItem.prototype._delete = function () {
     this.el.parentNode.removeChild(this.el);
+    TodoStore.remove(this._todo);
   };
 
   TodoItem.prototype.update = function () {
@@ -50,4 +52,4 @@ window.TodoItem = (function (document) {
   };
 
   return TodoItem;
-})(document);
+})(document, window.TodoStore);

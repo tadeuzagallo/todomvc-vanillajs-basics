@@ -1,4 +1,5 @@
 (function (window, document) {
-  var todoInput = new TodoInput('#new-todo');
-  var todoList = new TodoList('#todo-list');
+  new TodoInput('#new-todo');
+  new TodoList('#todo-list');
+  new TodoStats('#todo-count');
 })(window, document);
