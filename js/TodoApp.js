@@ -1,22 +1,37 @@
-(function (window, TodoInput, TodoList, TodoStats, TodoStore) {
+(function (window, document, TodoInput, TodoList, TodoStats, TodoStore) {
   'use strict';
 
-  new TodoInput('#new-todo');
-  var todoList = new TodoList('#todo-list');
-  new TodoStats('#todo-count');
+  function TodoApp() {
+    this.todoInput = new TodoInput('#new-todo');
+    this.todoList = new TodoList('#todo-list');
+    this.todoStats = new TodoStats('#todo-count');
 
-  function hashchange() {
+    this._find();
+    this._bind();
+    this._hashchange();
+  }
+
+  TodoApp.prototype._find = function () {
+    this.clearCompleted = document.querySelector('#clear-completed');
+  };
+
+  TodoApp.prototype._bind = function () {
+    window.addEventListener('hashchange', this._hashchange.bind(this));
+
+    this.clearCompleted.addEventListener('click', this._clear.bind(this));
+  };
+
+  TodoApp.prototype._hashchange = function () {
     switch (window.location.hash) {
       case '#/active':
-        todoList.filter = ['completed', false];
+        this.todoList.filter = ['completed', false];
         break;
       case '#/completed':
-        todoList.filter = ['completed', true];
+        this.todoList.filter = ['completed', true];
         break;
       default:
-        todoList.filter = false;
+        this.todoList.filter = false;
     }
-
 
     var prevSelected = document.querySelector('.selected');
     if (prevSelected) {
@@ -28,14 +43,13 @@
       selected.className = 'selected';
     }
 
-    todoList.refresh();
-  }
-  window.addEventListener('hashchange', hashchange);
-  hashchange();
+    this.todoList.refresh();
+  };
 
-  document.querySelector('#clear-completed').addEventListener('click', function () {
-    TodoStore.todos = TodoStore.activeTodos();
-    TodoStore.emmit('changeAll');
-    todoList.refresh();
-  });
-})(window, window.TodoInput, window.TodoList, window.TodoStats, window.TodoStore);
+  TodoApp.prototype._clear = function () {
+    TodoStore.clearCompleted();
+    this.todoList.refresh();
+  };
+
+  return new TodoApp();
+})(window, document, window.TodoInput, window.TodoList, window.TodoStats, window.TodoStore);

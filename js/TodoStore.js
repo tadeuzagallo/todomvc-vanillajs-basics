@@ -39,6 +39,11 @@ window.TodoStore = (function (Todo) {
     });
   };
 
+  TodoStore.clearCompleted = function () {
+    this.todos = this.activeTodos();
+    this.emmit('changeAll');
+  };
+
   TodoStore.on = function (event, callback) {
     if (typeof this.events[event] === 'undefined') {
       this.events[event] = [];
