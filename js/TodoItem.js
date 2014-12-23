@@ -4,6 +4,7 @@ window.TodoItem = (function (document) {
   function TodoItem(todo) {
     this._todo = todo;
     this._create();
+    this._bind();
     this.update();
   }
 
@@ -27,6 +28,20 @@ window.TodoItem = (function (document) {
     container.appendChild(this.destroy);
 
     this.el.appendChild(container);
+  };
+
+  TodoItem.prototype._bind = function () {
+    this.checkbox.addEventListener('change', this._toggle.bind(this));
+    this.destroy.addEventListener('click', this._delete.bind(this));
+  };
+
+  TodoItem.prototype._toggle = function () {
+    this._todo.completed = this.checkbox.checked;
+    this.update();
+  };
+
+  TodoItem.prototype._delete = function () {
+    this.el.parentNode.removeChild(this.el);
   };
 
   TodoItem.prototype.update = function () {
