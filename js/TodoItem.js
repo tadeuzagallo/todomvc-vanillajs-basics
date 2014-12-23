@@ -10,6 +10,7 @@ window.TodoItem = (function (document, TodoStore) {
 
   TodoItem.prototype._create = function () {
     this.el = document.createElement('li');
+    this.el.className = 'editing';
 
     var container = document.createElement('div');
     container.className = 'view';
@@ -23,6 +24,9 @@ window.TodoItem = (function (document, TodoStore) {
     this.destroy = document.createElement('button');
     this.destroy.className = 'destroy';
 
+    this.input = document.createElement('input');
+    this.input.className = 'edit';
+
     container.appendChild(this.checkbox);
     container.appendChild(this.label);
     container.appendChild(this.destroy);
@@ -33,6 +37,9 @@ window.TodoItem = (function (document, TodoStore) {
   TodoItem.prototype._bind = function () {
     this.checkbox.addEventListener('change', this._toggle.bind(this));
     this.destroy.addEventListener('click', this._delete.bind(this));
+    this.label.addEventListener('dblclick', this._edit.bind(this));
+    this.input.addEventListener('blur', this._doneEditing.bind(this));
+    this.input.addEventListener('keydown', this._keydown.bind(this));
   };
 
   TodoItem.prototype._toggle = function () {
@@ -44,6 +51,29 @@ window.TodoItem = (function (document, TodoStore) {
   TodoItem.prototype._delete = function () {
     this.el.parentNode.removeChild(this.el);
     TodoStore.remove(this._todo);
+  };
+
+  TodoItem.prototype._edit = function () {
+    this.oldClass = this.el.className;
+    this.el.className = 'editing';
+    this.input.value = this._todo.title;
+    this.el.appendChild(this.input);
+    this.input.focus();
+  };
+
+  TodoItem.prototype._doneEditing = function () {
+    this._todo.title = this.input.value.trim(); 
+    this.input.value = '';
+    this.update();
+
+    this.el.removeChild(this.input);
+    this.el.className = this.oldClass;
+  };
+
+  TodoItem.prototype._keydown = function (event) {
+    if (event.keyCode === 13) {
+      this.input.blur();
+    }
   };
 
   TodoItem.prototype.update = function () {
