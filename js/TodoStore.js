@@ -3,34 +3,48 @@ window.TodoStore = (function (Todo) {
 
   var TodoStore = {};
 
-  
   TodoStore.events = {};
 
-  var savedItems = localStorage.getItem('todos');
-  if (savedItems) {
-    TodoStore.todos = JSON.parse(savedItems);
+  var todos = localStorage.getItem('todos');
+  if (todos) {
+    TodoStore.todos = JSON.parse(todos);
   } else {
     TodoStore.todos = [];
   }
 
-  TodoStore.create = function (value) {
-    var newTodo = new Todo(value);
+  TodoStore.create = function (title) {
+    var newTodo = new Todo(title);
     this.todos.push(newTodo);
-    this.emmit('new', newTodo);
-    this.emmit('changeAll');
+    this.emmitEvent('new-todo', newTodo);
+    this.emmitEvent('change-all');
+  };
+
+  TodoStore.addEventListener = function(event, callback) {
+    if (typeof this.events[event] === 'undefined') {
+      this.events[event] = [];
+    }
+
+    this.events[event].push(callback);
+  };
+
+  TodoStore.emmitEvent = function (event) {
+    var callbacks = this.events[event];
+    var args = [].slice.call(arguments, 1);
+
+    if (callbacks) {
+      callbacks.forEach(function (callback) {
+        callback.apply(null, args);
+      });
+    }
   };
 
   TodoStore.destroy = function (todo) {
-    this.todos.splice(
-      this.todos.indexOf(todo),
-      1
-    );
+    var index = this.todos.indexOf(todo);
+    if (index > -1) {
+      this.todos.splice(index, 1);
+    }
 
-    this.emmit('changeAll');
-  };
-
-  TodoStore.save = function () {
-    localStorage.setItem('todos', JSON.stringify(this.todos));
+    this.emmitEvent('change-all');
   };
 
   TodoStore.activeTodos = function () {
@@ -39,46 +53,16 @@ window.TodoStore = (function (Todo) {
     });
   };
 
-  TodoStore.clearCompleted = function () {
+  TodoStore.save = function () {
+    localStorage.setItem('todos', JSON.stringify(TodoStore.todos));
+  };
+
+  TodoStore.clear = function () {
     this.todos = this.activeTodos();
-    this.emmit('changeAll');
+    this.emmitEvent('change-all');
   };
 
-  TodoStore.on = function (event, callback) {
-    if (typeof this.events[event] === 'undefined') {
-      this.events[event] = [];
-    }
-
-    this.events[event].push(callback);
-  };
-
-  TodoStore.off = function (event, callback) {
-    if (callback) {
-      var callbacks = this.events[event];
-      if (callbacks) {
-        for (var i = 0, l = callbacks.length; i < l; i++) {
-          if (callbacks[i] === callback) {
-            callbacks[i].splice(i, 1);
-            l--;
-          }
-        }
-      }
-    } else {
-      this.events[event] = undefined;
-    }
-  };
-
-  TodoStore.emmit = function (event, data) {
-    var callbacks = this.events[event];
-
-    if (callbacks) {
-      callbacks.forEach(function (callback) {
-        callback(data);
-      });
-    }
-  };
-
-  TodoStore.on('changeAll', TodoStore.save.bind(TodoStore));
+  TodoStore.addEventListener('change-all', TodoStore.save);
 
   return TodoStore;
-})(window.Todo, window.TodoList);
+})(window.Todo);

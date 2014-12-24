@@ -1,8 +1,8 @@
 window.Todo = (function () {
   'use strict';
 
-  function Todo(value) {
-    this.title = value;
+  function Todo(title) {
+    this.title = title;
     this.completed = false;
   }
 

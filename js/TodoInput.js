@@ -11,9 +11,9 @@ window.TodoInput = (function (document, TodoStore) {
   };
 
   TodoInput.prototype._keydown = function (event) {
-    if (event.keyCode === 13) {
-      TodoStore.create(event.target.value.trim());
-      event.target.value = '';
+    if (event.keyCode === 13) { // enter
+      TodoStore.create(this.value);
+      this.value = '';
     }
   };
 

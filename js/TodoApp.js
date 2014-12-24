@@ -6,23 +6,19 @@
     this.todoList = new TodoList('#todo-list');
     this.todoStats = new TodoStats('#todo-count');
 
-    this._find();
     this._bind();
     this._hashchange();
   }
 
-  TodoApp.prototype._find = function () {
-    this.clearCompleted = document.querySelector('#clear-completed');
-  };
-
   TodoApp.prototype._bind = function () {
     window.addEventListener('hashchange', this._hashchange.bind(this));
-
-    this.clearCompleted.addEventListener('click', this._clear.bind(this));
+    document.querySelector('#clear-completed').addEventListener('click', this._clear.bind(this));
   };
 
   TodoApp.prototype._hashchange = function () {
-    switch (window.location.hash) {
+    var hash = window.location.hash;
+
+    switch (hash) {
       case '#/active':
         this.todoList.filter = ['completed', false];
         break;
@@ -30,24 +26,24 @@
         this.todoList.filter = ['completed', true];
         break;
       default:
+        hash = '#/';
         this.todoList.filter = false;
     }
 
-    var prevSelected = document.querySelector('.selected');
-    if (prevSelected) {
-      prevSelected.className = '';
-    }
+    this.todoList.refresh();
 
-    var selected = document.querySelector('a[href="' + window.location.hash +'"]');
+    var old = document.querySelector('.selected');
+    if (old) {
+      old.className = '';
+    }
+    var selected = document.querySelector('a[href="' + hash + '"]');
     if (selected) {
       selected.className = 'selected';
     }
-
-    this.todoList.refresh();
   };
 
   TodoApp.prototype._clear = function () {
-    TodoStore.clearCompleted();
+    TodoStore.clear();
     this.todoList.refresh();
   };
 
